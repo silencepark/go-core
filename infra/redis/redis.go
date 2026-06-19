@@ -20,30 +20,28 @@ type Redis struct {
 }
 
 // NewRedis 初始化 Redis 客户端（单节点或集群），同时注册 Prometheus 指标和健康检查。
-func NewRedis(cfg *config.Config, cg *infra.CloserGroup, hr *health.HealthRegistry) (*Redis, error) {
-	metrics.Init(cfg.App.Name) // 确保 metrics 在首次使用时已注册（idempotent）
+func NewRedis(cfg *config.RedisConfig, cg *infra.CloserGroup, hr *health.HealthRegistry) (*Redis, error) {
 
-	rcfg := cfg.Redis
-	if len(rcfg.Addrs) == 0 {
+	if len(cfg.Addrs) == 0 {
 		return nil, fmt.Errorf("redis addrs is empty")
 	}
 
 	var client goredis.UniversalClient
-	if len(rcfg.Addrs) > 1 {
+	if len(cfg.Addrs) > 1 {
 		cc := goredis.NewClusterClient(&goredis.ClusterOptions{
-			Addrs:    rcfg.Addrs,
-			Password: rcfg.Password,
-			PoolSize: rcfg.PoolSize,
+			Addrs:    cfg.Addrs,
+			Password: cfg.Password,
+			PoolSize: cfg.PoolSize,
 		})
 		cc.AddHook(&metrics.RedisHook{})
 		client = cc
 	} else {
 		sc := goredis.NewClient(&goredis.Options{
-			Addr:         rcfg.Addrs[0],
-			Password:     rcfg.Password,
-			DB:           rcfg.DB,
-			PoolSize:     rcfg.PoolSize,
-			MinIdleConns: rcfg.MinIdle,
+			Addr:         cfg.Addrs[0],
+			Password:     cfg.Password,
+			DB:           cfg.DB,
+			PoolSize:     cfg.PoolSize,
+			MinIdleConns: cfg.MinIdle,
 		})
 		sc.AddHook(&metrics.RedisHook{})
 		metrics.RegisterRedisPoolStats(sc, "default")

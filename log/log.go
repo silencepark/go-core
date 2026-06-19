@@ -23,8 +23,8 @@ type Logger struct {
 }
 
 // New 根据日志配置创建 Logger。调用方应在启动早期调用一次，通过 DI 传递。
-func New(cfg *config.Config) (*Logger, error) {
-	logCfg := cfg.Log
+func New(cfg *config.LogConfig) (*Logger, error) {
+	logCfg := *cfg
 	level := zapcore.InfoLevel
 	if logCfg.Level != "" {
 		if err := level.Set(logCfg.Level); err != nil {

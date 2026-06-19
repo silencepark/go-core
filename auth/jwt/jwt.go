@@ -44,12 +44,12 @@ type TokenManager struct {
 }
 
 // NewTokenManager 创建 TokenManager，从 Config 提取所需字段。
-func NewTokenManager(cfg *config.Config) *TokenManager {
+func NewTokenManager(cfg *config.JWTConfig, appName string) *TokenManager {
 	return &TokenManager{
-		secret:       []byte(cfg.JWT.Secret),
-		appName:      cfg.App.Name,
-		expireHours:  cfg.JWT.ExpireHours,
-		refreshHours: cfg.JWT.RefreshHours,
+		secret:       []byte(cfg.Secret),
+		appName:      appName,
+		expireHours:  cfg.ExpireHours,
+		refreshHours: cfg.RefreshHours,
 	}
 }
 

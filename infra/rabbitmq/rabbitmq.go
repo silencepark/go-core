@@ -17,12 +17,12 @@ type RabbitMQ struct {
 }
 
 // NewRabbitMQ 初始化 RabbitMQ 连接；url 为空时跳过（无 RMQ Runner 场景）。
-func NewRabbitMQ(cfg *config.Config, cg *infra.CloserGroup) (*RabbitMQ, error) {
-	if cfg.RabbitMQ.URL == "" {
+func NewRabbitMQ(cfg *config.RabbitMQConfig, cg *infra.CloserGroup) (*RabbitMQ, error) {
+	if cfg.URL == "" {
 		return &RabbitMQ{}, nil
 	}
 
-	conn, err := amqp.Dial(cfg.RabbitMQ.URL)
+	conn, err := amqp.Dial(cfg.URL)
 	if err != nil {
 		return nil, fmt.Errorf("rabbitmq dial: %w", err)
 	}

@@ -25,15 +25,14 @@ type DB struct {
 
 // New 根据配置初始化业务库连接，自动注册健康检查和指标。
 // key 对应 YAML 中 mysql.<key> 的数据源名称（如 "platform"、"user"、"order"）。
-func New(cfg *config.Config, cg *infra.CloserGroup, hr *health.HealthRegistry, key string) (*DB, error) {
-	metrics.Init(cfg.App.Name) // 确保 metrics 在首次使用时已注册（idempotent）
+func New(mysqlCfg config.MySQLConfig, appMode string, cg *infra.CloserGroup, hr *health.HealthRegistry, key string) (*DB, error) {
 
-	sc, ok := cfg.MySQL[key]
+	sc, ok := mysqlCfg[key]
 	if !ok {
 		return nil, fmt.Errorf("mysql.%s not configured", key)
 	}
 
-	db, err := openSource(sc, cfg.App.Mode)
+	db, err := openSource(sc, appMode)
 	if err != nil {
 		return nil, fmt.Errorf("open platform db: %w", err)
 	}

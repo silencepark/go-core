@@ -14,7 +14,7 @@
 //	GET  /metrics        — Prometheus 指标
 //	GET  /debug/pprof/*  — Go pprof 性能分析
 //
-// cfg.App.AdminPort 为 0 时 New 返回 nil，可禁用运维端口。
+// cfg.AdminPort 为 0 时 New 返回 nil，可禁用运维端口。
 package admin
 
 import (
@@ -41,15 +41,15 @@ type Server struct {
 
 // New 创建并启动运维 Server。
 // 内部自动完成 metrics 命名空间设置和注册，调用方无需关心。
-// cfg.App.AdminPort 为 0 时返回 nil。
-func New(cfg *config.Config, hr *health.HealthRegistry) *Server {
-	port := cfg.App.AdminPort
+// cfg.AdminPort 为 0 时返回 nil。
+func New(cfg *config.AppConfig, hr *health.HealthRegistry) *Server {
+	port := cfg.AdminPort
 	if port <= 0 {
 		return nil
 	}
 
 	// 一行搞定：命名空间 + 注册所有 Prometheus 指标
-	metrics.Init(cfg.App.Name)
+	metrics.Init(cfg.Name)
 
 	engine := gin.New()
 	engine.Use(gin.Recovery())
