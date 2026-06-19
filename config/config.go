@@ -31,6 +31,9 @@ func (c *Config) SetDefaults() {
 	if c.App.AdminPort <= 0 {
 		c.App.AdminPort = 8600
 	}
+	if c.App.MaxBodyBytes <= 0 {
+		c.App.MaxBodyBytes = 1 << 20 // 1MB
+	}
 	if c.JWT.ExpireHours <= 0 {
 		c.JWT.ExpireHours = 24
 	}

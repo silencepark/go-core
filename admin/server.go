@@ -79,9 +79,9 @@ func New(cfg *config.AppConfig, hr *health.HealthRegistry) *Server {
 	// Prometheus 指标
 	engine.GET("/metrics", metrics.Handler())
 
-	// pprof 性能分析
-	pprofGroup := engine.Group("/debug/pprof")
-	{
+	// pprof 性能分析（生产可关闭）
+	if cfg.PprofEnabled {
+		pprofGroup := engine.Group("/debug/pprof")
 		pprofGroup.GET("/", gin.WrapF(pprof.Index))
 		pprofGroup.GET("/cmdline", gin.WrapF(pprof.Cmdline))
 		pprofGroup.GET("/profile", gin.WrapF(pprof.Profile))
