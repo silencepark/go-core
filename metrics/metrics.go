@@ -30,6 +30,13 @@ var Namespace = "default"
 // SetNamespace 设置 Prometheus 指标命名空间。必须在 MustRegister 之前调用。
 func SetNamespace(ns string) { Namespace = ns }
 
+// Init 设置命名空间并注册所有指标。可安全重复调用（sync.Once 保证单次注册）。
+// admin.New 内部已调用，业务入口也可显式调用（如 Worker 无 admin server 场景）。
+func Init(ns string) {
+	SetNamespace(ns)
+	MustRegister()
+}
+
 // ── HTTP 指标定义（懒初始化）──────────────────────
 
 var (

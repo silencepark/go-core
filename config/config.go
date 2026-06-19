@@ -20,6 +20,7 @@ type Config struct {
 
 func (c *Config) SetDefaults() {
 	if c.App.Mode == "" { c.App.Mode = "debug" }
+	if c.App.AdminPort <= 0 { c.App.AdminPort = 9090 }
 	if c.JWT.ExpireHours <= 0 { c.JWT.ExpireHours = 24 }
 	if c.JWT.RefreshHours <= 0 { c.JWT.RefreshHours = 168 }
 	if c.Log.Level == "" { c.Log.Level = "info" }
@@ -29,6 +30,7 @@ func (c *Config) SetDefaults() {
 func (c *Config) Validate() error {
 	if c.App.Name == "" { return fmt.Errorf("app.name is required") }
 	if c.App.Port <= 0 || c.App.Port > 65535 { return fmt.Errorf("app.port must be between 1 and 65535") }
+	if c.App.AdminPort > 0 && c.App.AdminPort == c.App.Port { return fmt.Errorf("app.admin_port must differ from app.port") }
 	if _, ok := c.MySQL["platform"]; !ok { return fmt.Errorf("mysql.platform is required") }
 	for name, src := range c.MySQL {
 		if src.Host == "" { return fmt.Errorf("mysql.%s.host is required", name) }
