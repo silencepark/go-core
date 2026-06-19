@@ -28,13 +28,31 @@ import (
 var Namespace = "default"
 
 // SetNamespace 设置 Prometheus 指标命名空间。必须在 MustRegister 之前调用。
-func SetNamespace(ns string) { Namespace = ns }
+// 自动将非法字符（如 -）替换为 _，确保符合 Prometheus 命名规范 [a-zA-Z_:][a-zA-Z0-9_:]*。
+func SetNamespace(ns string) {
+	Namespace = sanitizeName(ns)
+}
 
 // Init 设置命名空间并注册所有指标。可安全重复调用（sync.Once 保证单次注册）。
 // admin.New 内部已调用，业务入口也可显式调用（如 Worker 无 admin server 场景）。
 func Init(ns string) {
 	SetNamespace(ns)
 	MustRegister()
+}
+
+// sanitizeName 将 ns 中的非法 Prometheus 字符替换为 _。
+func sanitizeName(ns string) string {
+	b := []byte(ns)
+	for i, c := range b {
+		if (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_' || c == ':' {
+			continue
+		}
+		b[i] = '_'
+	}
+	if len(b) > 0 && b[0] >= '0' && b[0] <= '9' {
+		b[0] = '_'
+	}
+	return string(b)
 }
 
 // ── HTTP 指标定义（懒初始化）──────────────────────

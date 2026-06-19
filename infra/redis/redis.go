@@ -21,6 +21,8 @@ type Redis struct {
 
 // NewRedis 初始化 Redis 客户端（单节点或集群），同时注册 Prometheus 指标和健康检查。
 func NewRedis(cfg *config.Config, cg *infra.CloserGroup, hr *health.HealthRegistry) (*Redis, error) {
+	metrics.Init(cfg.App.Name) // 确保 metrics 在首次使用时已注册（idempotent）
+
 	rcfg := cfg.Redis
 	if len(rcfg.Addrs) == 0 {
 		return nil, fmt.Errorf("redis addrs is empty")

@@ -26,6 +26,8 @@ type DB struct {
 // New 根据配置初始化业务库连接，自动注册健康检查和指标。
 // key 对应 YAML 中 mysql.<key> 的数据源名称（如 "platform"、"user"、"order"）。
 func New(cfg *config.Config, cg *infra.CloserGroup, hr *health.HealthRegistry, key string) (*DB, error) {
+	metrics.Init(cfg.App.Name) // 确保 metrics 在首次使用时已注册（idempotent）
+
 	sc, ok := cfg.MySQL[key]
 	if !ok {
 		return nil, fmt.Errorf("mysql.%s not configured", key)
